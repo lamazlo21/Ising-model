@@ -2,6 +2,7 @@ import numpy as np
 import random as rand
 import math
 import matplotlib.pyplot
+from PIL import Image, ImageColor
 
 class Ising:
 
@@ -55,18 +56,18 @@ class Ising:
             m = (1/(size*size))*sum
             avgArray.append((m,time))
             time = time+1
-
+        self.drawConfiguration(self, lattice,size)
         return avgArray
 
 
 
-    def avgMagnetization(self, size):
+    def avgMagnetization(self, size, start, stop,numbFiles):
         results = []
-        i = 2.6
-        while i<=3.5:
+        i = start
+        while i<=stop:
             sum = 0
             count = 0
-            for j in range(5):
+            for j in range(numbFiles):
                 fileName = 'Mag' + str(size) + 'L' + str(i).replace('.', '') + str(j) + '.txt'
                 tempArray = self.readAvgFromFile(self, fileName)
                 for k in range(100, len(tempArray), 1000):
@@ -93,25 +94,29 @@ class Ising:
         file.close()
         return tempArray
 
+    def drawConfiguration(self, lattice,size):
+        im = Image.new('RGB',(size,size), "rgb(255,255,255)")
+        for i in range(size):
+            for j in range(size):
+                if lattice[i][j]==1:
+                    im.putpixel((i,j), ImageColor.getrgb("rgb(255,0,0)"))
+        im.save('pixel.png')
+
 ising = Ising
 size = 40
-temperature = 2.8
+temperature = 5
 #code that compute avrage magnetization
-for j in range(19):
-    for i in range(5):
-        fileName = 'Mag'+str(size)+'L'+str(temperature).replace('.','')+str(i)+'.txt'
-        lattice = ising.setLattice(ising,size)
-        avgSpinArray = ising.metropolis(ising, size, lattice, temperature)
-        ising.avgSpinToFile(ising,avgSpinArray,fileName)
-    temperature = round(temperature + 0.1,3)
-#avgMagnetization = []
-#ising.readAvgFromFile(ising,avgMagnetization,'Mag10L170.txt')
-#ising.avgMagnetization(ising, x,y, avg,tempA)
-#matplotlib.pyplot.scatter(y,x, label='a')
-#matplotlib.pyplot.xlabel('t[MCS]')
-#matplotlib.pyplot.ylabel('m')
-#matplotlib.pyplot.title('Magnetyzacja L =' +str(size)+', T = '+str(temperature))
-#matplotlib.pyplot.show()
-#print(ising.avgMagnetization(ising, size))
+#for j in range(7):
+    #for i in range(5):
+    #    fileName = 'Mag'+str(size)+'L'+str(temperature).replace('.','')+str(i)+'.txt'
+   #     lattice = ising.setLattice(ising,size)
+  #      avgSpinArray = ising.metropolis(ising, size, lattice, temperature)
+ #       ising.avgSpinToFile(ising,avgSpinArray,fileName)
+#    temperature = round(temperature + 0.1,3)
 
-#print(avg)
+#avgMagnetization
+#avgMagnetization = ising.avgMagnetization(ising, size,1.7,3.5,5)
+#ising.avgSpinToFile(ising,avgMagnetization,'avgMag40.txt')
+lattice = ising.setLattice(ising,size)
+avgSpinArray = ising.metropolis(ising, size, lattice, temperature)
+
